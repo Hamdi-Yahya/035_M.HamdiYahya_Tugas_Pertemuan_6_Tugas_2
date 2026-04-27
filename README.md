@@ -158,6 +158,7 @@ Untuk menjalankan stored procedure, gunakan perintah berikut:
 
 ```sql
 CALL tampil_buku();
+```
 
 ![Hasil](ss2/cara_panggil_query_18.png) 
 
