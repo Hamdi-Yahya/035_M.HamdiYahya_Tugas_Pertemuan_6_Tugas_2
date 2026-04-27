@@ -1,11 +1,6 @@
--- =====================================================
--- GUNAKAN DATABASE
--- =====================================================
 USE perpustakaan;
 
--- =====================================================
 -- 1. TABEL KATEGORI_BUKU
--- =====================================================
 CREATE TABLE kategori_buku (
     id_kategori INT AUTO_INCREMENT PRIMARY KEY,
     nama_kategori VARCHAR(50) NOT NULL UNIQUE,
@@ -14,9 +9,7 @@ CREATE TABLE kategori_buku (
     is_deleted TINYINT(1) DEFAULT 0
 );
 
--- =====================================================
 -- 2. TABEL PENERBIT
--- =====================================================
 CREATE TABLE penerbit (
     id_penerbit INT AUTO_INCREMENT PRIMARY KEY,
     nama_penerbit VARCHAR(100) NOT NULL,
@@ -27,9 +20,7 @@ CREATE TABLE penerbit (
     is_deleted TINYINT(1) DEFAULT 0
 );
 
--- =====================================================
 -- 3. TABEL RAK (BONUS)
--- =====================================================
 CREATE TABLE rak (
     id_rak INT AUTO_INCREMENT PRIMARY KEY,
     kode_rak VARCHAR(20) NOT NULL UNIQUE,
@@ -39,9 +30,7 @@ CREATE TABLE rak (
     is_deleted TINYINT(1) DEFAULT 0
 );
 
--- =====================================================
 -- 4. INSERT KATEGORI
--- =====================================================
 INSERT INTO kategori_buku (nama_kategori, deskripsi) VALUES
 ('Programming', 'Buku pemrograman'),
 ('Database', 'Buku database'),
@@ -49,9 +38,7 @@ INSERT INTO kategori_buku (nama_kategori, deskripsi) VALUES
 ('Networking', 'Buku jaringan'),
 ('Security', 'Buku keamanan');
 
--- =====================================================
 -- 5. INSERT PENERBIT
--- =====================================================
 INSERT INTO penerbit (nama_penerbit, alamat, telepon, email) VALUES
 ('Informatika', 'Bandung', '022111111', 'info@informatika.com'),
 ('Andi', 'Yogyakarta', '027411111', 'andi@publisher.com'),
@@ -59,9 +46,7 @@ INSERT INTO penerbit (nama_penerbit, alamat, telepon, email) VALUES
 ('Elex Media', 'Jakarta', '021333333', 'elex@media.com'),
 ('Gramedia', 'Jakarta', '021444444', 'gramedia@store.com');
 
--- =====================================================
 -- 6. INSERT RAK
--- =====================================================
 INSERT INTO rak (kode_rak, nama_rak, lokasi) VALUES
 ('RK-A1', 'Rak A1', 'Lantai 1'),
 ('RK-A2', 'Rak A2', 'Lantai 1'),
@@ -69,17 +54,13 @@ INSERT INTO rak (kode_rak, nama_rak, lokasi) VALUES
 ('RK-C1', 'Rak C1', 'Lantai 2'),
 ('RK-D1', 'Rak D1', 'Lantai 3');
 
--- =====================================================
 -- 7. TAMBAH KOLOM RELASI DI BUKU
--- =====================================================
 ALTER TABLE buku
 ADD COLUMN id_kategori INT,
 ADD COLUMN id_penerbit INT,
 ADD COLUMN id_rak INT,
 
--- =====================================================
 -- 8. MAPPING DATA LAMA
--- =====================================================
 UPDATE buku b
 JOIN kategori_buku k ON b.kategori = k.nama_kategori
 SET b.id_kategori = k.id_kategori;
@@ -88,31 +69,23 @@ UPDATE buku b
 JOIN penerbit p ON b.penerbit = p.nama_penerbit
 SET b.id_penerbit = p.id_penerbit;
 
--- =====================================================
 -- 9. SET NOT NULL
--- =====================================================
 ALTER TABLE buku
 MODIFY id_kategori INT NOT NULL,
 MODIFY id_penerbit INT NOT NULL;
 
--- =====================================================
 -- 10. FOREIGN KEY
--- =====================================================
 ALTER TABLE buku
 ADD CONSTRAINT fk_kategori FOREIGN KEY (id_kategori) REFERENCES kategori_buku(id_kategori),
 ADD CONSTRAINT fk_penerbit FOREIGN KEY (id_penerbit) REFERENCES penerbit(id_penerbit),
 ADD CONSTRAINT fk_rak FOREIGN KEY (id_rak) REFERENCES rak(id_rak);
 
--- =====================================================
 -- 11. HAPUS KOLOM LAMA
--- =====================================================
 ALTER TABLE buku
 DROP COLUMN kategori,
 DROP COLUMN penerbit;
 
--- =====================================================
 -- 12. TAMBAH 12 BUKU BARU
--- =====================================================
 INSERT INTO buku 
 (kode_buku, judul, id_kategori, id_penerbit, id_rak, pengarang, tahun_terbit, isbn, harga, stok, deskripsi)
 VALUES
@@ -129,47 +102,35 @@ VALUES
 ('BK-020', 'NodeJS API', 1, 1, 1, 'Budi Raharjo', 2024, '121', 100000, 11, 'API'),
 ('BK-021', 'Big Data', 2, 2, 2, 'Sari', 2024, '122', 180000, 6, 'Data');
 
--- =====================================================
 -- 13. QUERY JOIN
--- =====================================================
 SELECT b.judul, k.nama_kategori, p.nama_penerbit
 FROM buku b
 JOIN kategori_buku k ON b.id_kategori = k.id_kategori
 JOIN penerbit p ON b.id_penerbit = p.id_penerbit;
 
--- =====================================================
 -- 14. JUMLAH PER KATEGORI
--- =====================================================
 SELECT k.nama_kategori, COUNT(*) AS jumlah
 FROM buku b
 JOIN kategori_buku k ON b.id_kategori = k.id_kategori
 GROUP BY k.nama_kategori;
 
--- =====================================================
 -- 15. JUMLAH PER PENERBIT
--- =====================================================
 SELECT p.nama_penerbit, COUNT(*) AS jumlah
 FROM buku b
 JOIN penerbit p ON b.id_penerbit = p.id_penerbit
 GROUP BY p.nama_penerbit;
 
--- =====================================================
 -- 16. DETAIL LENGKAP
--- =====================================================
 SELECT b.*, k.nama_kategori, p.nama_penerbit
 FROM buku b
 JOIN kategori_buku k ON b.id_kategori = k.id_kategori
 JOIN penerbit p ON b.id_penerbit = p.id_penerbit;
 
--- =====================================================
 -- 17. SOFT DELETE SEMUA TABEL
--- =====================================================
 ALTER TABLE anggota ADD COLUMN is_deleted TINYINT(1) DEFAULT 0;
 ALTER TABLE transaksi ADD COLUMN is_deleted TINYINT(1) DEFAULT 0;
 
--- =====================================================
 -- 18. STORED PROCEDURE
--- =====================================================
 DELIMITER $$
 
 CREATE PROCEDURE tampil_buku()
